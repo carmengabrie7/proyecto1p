@@ -30,7 +30,7 @@ public class Reportes extends JFrame {
         fondo.setLayout(null);
         add(fondo);
 
-        ImageIcon logo = new ImageIcon("src/imagenes/logo vw.jpg");
+        ImageIcon logo = new ImageIcon("src/imagenes/logo.jpg");
         setIconImage(logo.getImage());
 
         JLabel titulo = new JLabel("Reportes", SwingConstants.CENTER);

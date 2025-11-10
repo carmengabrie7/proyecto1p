@@ -101,42 +101,7 @@ public class TableroGUI extends JFrame {
         btnRuleta.setForeground(Color.WHITE);
         fondo.add(btnRuleta);
         
-        btnRuleta.addActionListener(e -> {
-    lblInfo.setText("Girando la ruleta...");
-    btnRuleta.setEnabled(false);
-    ruletaGirada = false;
-
-    ruleta.girar(() -> {
-        String resultado = ruleta.getResultado();
-        piezaPermitida = resultado;
-
-        boolean existePieza = false;
-        AbstractPiezas[][] tablero = logica.getTablero();
-
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
-                if (tablero[i][j] != null &&
-                    tablero[i][j].getColor().equals(logica.getTurno()) &&
-                    tablero[i][j].getClass().getSimpleName().equalsIgnoreCase(resultado.replace(" ", ""))) {
-                    existePieza = true;
-                    break;
-                }
-            }
-            if (existePieza) break;
-        }
-
-        if (!existePieza) {
-            lblInfo.setText("No quedan piezas de tipo " + resultado + ". Girando de nuevo...");
-            try { Thread.sleep(1000); } catch (InterruptedException ex) {}
-            ruleta.girar(this::repaint); // vuelve a girar automáticamente
-            return;
-        }
-
-        ruletaGirada = true;
-        btnRuleta.setEnabled(true);
-        lblInfo.setText("Solo puedes mover: " + resultado + " este turno.");
-    });
-});
+       btnRuleta.addActionListener(e -> girarRuletaValidando());
 
         
         btnRetirarse = new JButton("Retirarse");
@@ -159,7 +124,7 @@ public class TableroGUI extends JFrame {
         String ganador = jugadorRendido.equals("Blanco") ? "Negro" : "Blanco";
 
         Usuario ganadorJugador = ganador.equals("Blanco") ? jugadorBlanco : jugadorNegro;
-        ganadorJugador.setPuntos(ganadorJugador.getPuntos() + 1);
+        ganadorJugador.setPuntos(ganadorJugador.getPuntos() + 3);
 
         logicaUsuarios.registrarPartida(
             jugadorBlanco.getNombre(),
@@ -189,6 +154,47 @@ public class TableroGUI extends JFrame {
     }
     
     //metodos
+    private void girarRuletaValidando() {
+    lblInfo.setText("Girando la ruleta...");
+    btnRuleta.setEnabled(false);
+    ruletaGirada = false;
+
+    ruleta.girar(() -> {
+        String resultado = ruleta.getResultado();
+        piezaPermitida = resultado;
+
+        boolean existePieza = false;
+        AbstractPiezas[][] tablero = logica.getTablero();
+        String turno = logica.getTurno();
+
+        for (int i = 0; i < 6 && !existePieza; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (tablero[i][j] != null
+                        && turno.equals(tablero[i][j].getColor())
+                        && tablero[i][j].getClass().getSimpleName()
+                                .equalsIgnoreCase(resultado.replace(" ", ""))) {
+                    existePieza = true;
+                    break;
+                }
+            }
+        }
+
+        if (!existePieza) {
+            lblInfo.setText("No quedan piezas de tipo " + resultado + ". Girando de nuevo...");
+            new javax.swing.Timer(900, ev -> {
+                ((javax.swing.Timer) ev.getSource()).stop();
+                girarRuletaValidando(); // vuelve a girar de nuevo
+            }).start();
+            return;
+        }
+
+        // si hay piezas válidas, se habilita el turno
+        ruletaGirada = true;
+        btnRuleta.setEnabled(true);
+        lblInfo.setText("Solo puedes mover: " + resultado + " este turno.");
+    });
+}
+
     private void manejarClick(int x, int y) {
     AbstractPiezas[][] tablero = logica.getTablero();
 
@@ -403,17 +409,13 @@ logicaUsuarios.registrarPartida(
                 celdas[nf][nc].setBackground(new Color(100, 220, 120));
                 celdas[nf][nc].setBorderPainted(true);
                 celdas[nf][nc].setBorder(javax.swing.BorderFactory.createLineBorder(new Color(0,0,0,80), 1));
-                // si es libre, podemos seguir extendiendo en esta dirección (solo lobo)
                 continue;
             } else {
-                // hay una pieza
                 if (!celda.getColor().equals(pieza.getColor())) {
-                    // enemigo → ataque posible (rojo) y se detiene en esta dirección
                     celdas[nf][nc].setBackground(new Color(220, 80, 80));
                     celdas[nf][nc].setBorderPainted(true);
                     celdas[nf][nc].setBorder(javax.swing.BorderFactory.createLineBorder(new Color(0,0,0,80), 1));
                 }
-                // pieza propia o enemigo: detener en esta dirección
                 break;
             }
         }

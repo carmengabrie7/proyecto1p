@@ -43,7 +43,7 @@ public class TableroGUI extends JFrame {
         setLocationRelativeTo(null);
         setLayout(null);
         
-        ImageIcon fondoImg = new ImageIcon("src/imagenes/fondo juego.jpg");
+        ImageIcon fondoImg = new ImageIcon("src/imagenes/juego.jpg");
         JLabel fondo = new JLabel();
         fondo.setIcon(new ImageIcon(fondoImg.getImage().getScaledInstance(800, 500, Image.SCALE_SMOOTH)));
         fondo.setBounds(0, 0, 800, 500);
@@ -51,7 +51,7 @@ public class TableroGUI extends JFrame {
         add(fondo);
         setContentPane(fondo);
         
-        ImageIcon logo = new ImageIcon("src/imagenes/logo vw.jpg"); 
+        ImageIcon logo = new ImageIcon("src/imagenes/logo.jpg"); 
         setIconImage(logo.getImage());
         
         ruleta = new RuletaPanel();
@@ -101,20 +101,43 @@ public class TableroGUI extends JFrame {
         btnRuleta.setForeground(Color.WHITE);
         fondo.add(btnRuleta);
         
-        btnRuleta.addActionListener(e-> {
-            lblInfo.setText("Girando la ruleta...");
-            btnRuleta.setEnabled(false);
-            ruletaGirada = false;
-            
-            ruleta.girar(() -> {
-                String resultado = ruleta.getResultado();
-                piezaPermitida = resultado;
-                ruletaGirada = true;
-                btnRuleta.setEnabled(true);
-                lblInfo.setText("Te toco mover: "+resultado+"!");
-            });
-            
-        });
+        btnRuleta.addActionListener(e -> {
+    lblInfo.setText("Girando la ruleta...");
+    btnRuleta.setEnabled(false);
+    ruletaGirada = false;
+
+    ruleta.girar(() -> {
+        String resultado = ruleta.getResultado();
+        piezaPermitida = resultado;
+
+        boolean existePieza = false;
+        AbstractPiezas[][] tablero = logica.getTablero();
+
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (tablero[i][j] != null &&
+                    tablero[i][j].getColor().equals(logica.getTurno()) &&
+                    tablero[i][j].getClass().getSimpleName().equalsIgnoreCase(resultado.replace(" ", ""))) {
+                    existePieza = true;
+                    break;
+                }
+            }
+            if (existePieza) break;
+        }
+
+        if (!existePieza) {
+            lblInfo.setText("No quedan piezas de tipo " + resultado + ". Girando de nuevo...");
+            try { Thread.sleep(1000); } catch (InterruptedException ex) {}
+            ruleta.girar(this::repaint); // vuelve a girar automáticamente
+            return;
+        }
+
+        ruletaGirada = true;
+        btnRuleta.setEnabled(true);
+        lblInfo.setText("Solo puedes mover: " + resultado + " este turno.");
+    });
+});
+
         
         btnRetirarse = new JButton("Retirarse");
         btnRetirarse.setBounds(550, 420,160, 35);

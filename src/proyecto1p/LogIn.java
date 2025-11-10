@@ -34,7 +34,7 @@ public LogIn(LogicaUsuarios logica) {
         fondo.setLayout(null);
         add(fondo);
         
-        ImageIcon logo = new ImageIcon("src/imagenes/logo vw.jpg"); 
+        ImageIcon logo = new ImageIcon("src/imagenes/logo.jpg"); 
         setIconImage(logo.getImage());
         
         JLabel titulo = new JLabel("Log In", SwingConstants.CENTER);

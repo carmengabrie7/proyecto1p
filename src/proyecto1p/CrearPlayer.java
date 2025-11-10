@@ -35,7 +35,7 @@ public class CrearPlayer extends JFrame{
         add(fondo);
         
         //logo
-        ImageIcon logo = new ImageIcon("src/imagenes/logo vw.jpg"); 
+        ImageIcon logo = new ImageIcon("src/imagenes/logo.jpg"); 
         setIconImage(logo.getImage());
         
         JLabel titulo = new JLabel("Crear Player", SwingConstants.CENTER);

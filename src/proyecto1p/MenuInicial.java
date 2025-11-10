@@ -31,7 +31,7 @@ LogicaUsuarios logica = new LogicaUsuarios();
         fondo.setBounds(0, 0, 800, 500);
         fondo.setLayout(null);
         
-        ImageIcon logo = new ImageIcon("src/imagenes/logo vw.jpg"); 
+        ImageIcon logo = new ImageIcon("src/imagenes/logo.jpg"); 
         setIconImage(logo.getImage()); 
 
         // titulo
